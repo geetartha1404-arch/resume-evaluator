@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular;
+  --font-display: var(--font-bodoni-moda), serif;
+  
+  --color-brand: #0F62FE;
+  --color-brand-light: #EBF2FF;
+  --color-brand-hover: #034ad9;
+  --color-accent-success: #10B981;
+  --color-accent-success-light: #ECFDF5;
+  --color-accent-warning: #F97316;
+  --color-accent-warning-light: #FFF7ED;
+  --color-accent-danger: #EF4444;
+  --color-accent-danger-light: #FEF2F2;
+  --color-bg-canvas: #F8FAFC;
+  --color-surface-card: #FFFFFF;
+  --color-border-tactical: #E2E8F0;
+  
+  --animate-radar-sweep: radar-sweep 12s linear infinite;
+  --animate-scanning: scanning 3s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes radar-sweep {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes scanning {
+    0%, 100% {
+      top: 0%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.8;
+    }
+    90% {
+      opacity: 0.8;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
+    }
+  }
+}
+
+/* Custom Utilities for Bright Cartography Theme */
+.blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(15, 98, 254, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 98, 254, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.blueprint-grid-fine {
+  background-image: 
+    linear-gradient(to right, rgba(15, 98, 254, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 98, 254, 0.025) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.dot-pattern {
+  background-image: radial-gradient(rgba(15, 98, 254, 0.06) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Custom style for resume text gaps */
+.resume-gap-highlight {
+  cursor: help;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.resume-gap-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-accent-warning);
+  transform: scaleX(1);
+  transition: transform 0.2s ease;
+}
+
+.resume-gap-highlight:hover {
+  background-color: var(--color-accent-warning-light);
+}
+
+.resume-gap-highlight:hover::after {
+  height: 3px;
+}

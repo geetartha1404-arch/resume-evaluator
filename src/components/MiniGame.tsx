@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useResume } from "@/context/ResumeContext";
 
 interface Choice {
   text: string;
@@ -182,7 +183,20 @@ const SCENARIOS: Scenario[] = [
   },
 ];
 
+// Map common role keywords to scenario ids
+function pickRecommendedScenarioId(suggestedRoles: string[] | undefined): string | null {
+  if (!suggestedRoles?.length) return null;
+  const top = suggestedRoles[0].toLowerCase();
+  if (top.includes("product") || top.includes("pm")) return "launch";
+  if (top.includes("strategy") || top.includes("analyst") || top.includes("data")) return "retention";
+  return null;
+}
+
 export default function MiniGame() {
+  const { uploadedResume } = useResume();
+  const suggestedRoles = uploadedResume?.evaluation?.suggested_roles;
+  const recommendedId = pickRecommendedScenarioId(suggestedRoles);
+
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [gameScores, setGameScores] = useState<number[]>([]);
@@ -254,6 +268,14 @@ export default function MiniGame() {
           <p className="max-w-xl mx-auto text-slate-500 text-sm mt-2">
             Practice handling product emergencies and strategic dilemmas. Experience the live, gamified coaching built into reevalve.
           </p>
+          {suggestedRoles?.length && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-brand/20 bg-brand-light px-3 py-2 text-xs font-mono text-brand">
+              <span className="font-bold">Based on your resume</span> — recommended for:
+              {suggestedRoles.slice(0, 2).map((r) => (
+                <span key={r} className="rounded bg-brand/10 px-1.5 py-0.5 font-bold">{r}</span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Terminal Screen Container */}
@@ -280,33 +302,47 @@ export default function MiniGame() {
                   Select a live scenario to begin the simulation. Your decisions will be scored in real-time across execution, stakeholder leadership, and technical capability.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
-                  {SCENARIOS.map((sc) => (
-                    <button
-                      key={sc.id}
-                      onClick={() => startScenario(sc)}
-                      className="flex flex-col justify-between text-left p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-brand hover:bg-brand-light/20 hover:scale-[1.01] active:scale-[0.99] transition-all group"
-                    >
-                      <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="rounded bg-brand-light border border-brand/10 text-brand px-1.5 py-0.5 text-[9px] font-bold">
-                            {sc.role}
-                          </span>
-                          <span className="text-[9px] font-semibold text-slate-400">
-                            Diff: {sc.difficulty}
-                          </span>
+                  {SCENARIOS.map((sc) => {
+                    const isRecommended = recommendedId === sc.id;
+                    return (
+                      <button
+                        key={sc.id}
+                        onClick={() => startScenario(sc)}
+                        className={`flex flex-col justify-between text-left p-4 rounded-xl border bg-slate-50/50 hover:scale-[1.01] active:scale-[0.99] transition-all group ${
+                          isRecommended
+                            ? "border-brand ring-1 ring-brand bg-brand-light/20"
+                            : "border-slate-200 hover:border-brand hover:bg-brand-light/20"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="rounded bg-brand-light border border-brand/10 text-brand px-1.5 py-0.5 text-[9px] font-bold">
+                              {sc.role}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              {isRecommended && (
+                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">
+                                  ★ For You
+                                </span>
+                              )}
+                              <span className="text-[9px] font-semibold text-slate-400">
+                                Diff: {sc.difficulty}
+                              </span>
+                            </div>
+                          </div>
+                          <h4 className="font-sans font-bold text-slate-800 text-sm group-hover:text-brand transition-colors mb-2">
+                            {sc.title}
+                          </h4>
+                          <p className="text-[10px] text-slate-500 font-sans line-clamp-3 leading-relaxed">
+                            {sc.intro}
+                          </p>
                         </div>
-                        <h4 className="font-sans font-bold text-slate-800 text-sm group-hover:text-brand transition-colors mb-2">
-                          {sc.title}
-                        </h4>
-                        <p className="text-[10px] text-slate-500 font-sans line-clamp-3 leading-relaxed">
-                          {sc.intro}
-                        </p>
-                      </div>
-                      <span className="inline-block mt-4 text-[10px] font-bold text-brand group-hover:translate-x-1 transition-transform">
-                        INITIALIZE SCAN &gt;
-                      </span>
-                    </button>
-                  ))}
+                        <span className="inline-block mt-4 text-[10px] font-bold text-brand group-hover:translate-x-1 transition-transform">
+                          INITIALIZE SCAN &gt;
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ) : isFinished ? (

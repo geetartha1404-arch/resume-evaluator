@@ -91,12 +91,21 @@ export default function Pricing() {
                 <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest block mb-2">
                   {tier.name}
                 </span>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="font-display text-4xl font-black text-slate-900 leading-none">
-                    {tier.price}
-                  </span>
+                <div className="flex items-baseline gap-0.5 mb-2">
+                  {tier.price.startsWith("$") ? (
+                    <>
+                      <span className="font-sans text-xl font-bold text-slate-450 self-start pt-0.5">$</span>
+                      <span className="font-display text-4xl font-black text-slate-900 leading-none">
+                        {tier.price.slice(1)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="font-display text-4xl font-black text-slate-900 leading-none">
+                      {tier.price}
+                    </span>
+                  )}
                   {tier.period && (
-                    <span className="text-slate-500 text-xs font-bold">{tier.period}</span>
+                    <span className="text-slate-500 text-xs font-bold ml-1">{tier.period}</span>
                   )}
                 </div>
                 <p className="text-slate-500 text-xs leading-relaxed font-semibold mb-6">

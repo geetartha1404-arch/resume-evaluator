@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useResume } from "@/context/ResumeContext";
 
 interface TemplateType {
   id: string;
@@ -100,6 +101,8 @@ ${userName || "[Your Name]"}`;
 ];
 
 export default function TemplateBuilder() {
+  const { uploadedResume } = useResume();
+
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("linkedin");
   const [userName, setUserName] = useState<string>("Alex Chen");
   const [contactName, setContactName] = useState<string>("Rebecca Holmes");
@@ -107,6 +110,32 @@ export default function TemplateBuilder() {
   const [role, setRole] = useState<string>("Product Manager");
   const [backgroundType, setBackgroundType] = useState<string>("engineer");
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Seed / reset form based on uploaded resume
+  useEffect(() => {
+    const ev = uploadedResume?.evaluation;
+    if (ev) {
+      const suggestedRole = ev.suggested_roles?.[0] ?? "Product Manager";
+      setRole(suggestedRole);
+
+      // Derive background type from technical vs soft skills
+      const tech = ev.skills?.technical ?? [];
+      const hasEngSkills = tech.some((s) =>
+        /react|node|python|java|sql|api|cloud|aws|docker/i.test(s)
+      );
+      const hasMbaSkills = tech.some((s) =>
+        /strategy|marketing|consulting|mba|finance/i.test(s)
+      );
+      if (hasEngSkills) setBackgroundType("engineer");
+      else if (hasMbaSkills) setBackgroundType("mba");
+      else setBackgroundType("ops");
+    } else {
+      // Reset to defaults when resume is removed
+      setRole("Product Manager");
+      setBackgroundType("engineer");
+      setUserName("Alex Chen");
+    }
+  }, [uploadedResume]);
 
   const activeTemplate = TEMPLATE_TYPES.find((t) => t.id === selectedTemplateId) || TEMPLATE_TYPES[0];
 
@@ -143,6 +172,12 @@ export default function TemplateBuilder() {
           <p className="max-w-xl mx-auto text-slate-500 text-sm mt-2">
             AI-driven, role-tailored templates that frame your background metrics specifically for recruiters, founders, and alumni.
           </p>
+          {uploadedResume?.evaluation && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-mono text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Template seeded from your resume · Target role: <strong>{uploadedResume.evaluation.suggested_roles?.[0] ?? role}</strong>
+            </div>
+          )}
         </div>
 
         {/* Builder Layout Grid */}
@@ -201,7 +236,7 @@ export default function TemplateBuilder() {
               </div>
 
               {/* Text Fields */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     My Name
@@ -226,7 +261,7 @@ export default function TemplateBuilder() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Target Company

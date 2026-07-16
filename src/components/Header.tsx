@@ -46,7 +46,7 @@ export default function Header() {
         <div className="flex items-center overflow-visible">
           <Link href="/" className="flex items-center">
             <img
-              src="/reevalve.gif"
+              src="/reevalve_footer.jpg"
               alt="reevalve"
               className="h-9 w-auto object-contain mix-blend-multiply transition-transform"
             />
